@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% block title %}Echelon POS{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head>
+<body class="{% if request.args.get('mobile') or request.path.startswith('/mobile') %}mobile-mode{% endif %}">
+{% if current_user %}
+<div class="app-shell">
+<aside class="sidebar">
+<a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">E</span><span><b>echelon</b><small>RETAIL SYSTEMS</small></span></a>
+<div class="store-pill"><span class="live-dot"></span> Main store <span class="chevron">⌄</span></div>
+<div class="nav-label">WORKSPACE</div>
+<nav>
+{% if current_role=='admin' %}
+<a class="nav-link {% if request.path in ['/dashboard','/mobile'] %}active{% endif %}" href="{{ url_for('dashboard') }}"><span>◫</span> Overview</a>
+<a class="nav-link {% if request.path=='/products' %}active{% endif %}" href="{{ url_for('products') }}"><span>▦</span> Products <span class="nav-count">01</span></a>
+<a class="nav-link {% if request.path=='/transactions' %}active{% endif %}" href="{{ url_for('transactions') }}"><span>▤</span> Transactions</a>
+<a class="nav-link {% if request.path=='/returns' %}active{% endif %}" href="{{ url_for('returns') }}"><span>↶</span> Returns</a>
+<div class="nav-label">MANAGEMENT</div>
+<a class="nav-link {% if request.path=='/staff' %}active{% endif %}" href="{{ url_for('staff') }}"><span>♙</span> Staff</a>
+<a class="nav-link {% if request.path=='/suppliers' %}active{% endif %}" href="{{ url_for('suppliers') }}"><span>♧</span> Suppliers</a>
+<a class="nav-link {% if request.path=='/ledger' %}active{% endif %}" href="{{ url_for('ledger') }}"><span>≋</span> Ledger</a>
+<a class="nav-link {% if request.path=='/reports' %}active{% endif %}" href="{{ url_for('reports') }}"><span>▥</span> Reports</a>
+{% endif %}
+<a class="nav-link {% if request.path=='/billing' %}active{% endif %}" href="{{ url_for('billing') }}"><span>▣</span> Billing terminal <span class="nav-arrow">↗</span></a>
+</nav>
+<div class="sidebar-bottom"><div class="help-card"><span class="help-icon">✦</span><b>Need a hand?</b><p>Your retail workspace, all in one place.</p></div><div class="profile"><div class="avatar">{{ current_user[:1]|upper }}</div><div class="profile-text"><b>{{ current_user }}</b><small>{{ current_role|title }} account</small></div><a href="{{ url_for('logout') }}" title="Sign out">↗</a></div></div>
+</aside>
+<main class="main-area"><header class="topbar"><button class="mobile-menu" onclick="document.body.classList.toggle('nav-open')">☰</button><div class="crumb">Workspace <span>/</span> <b>{% block crumb %}Overview{% endblock %}</b></div><div class="top-actions"><span class="today-label" id="todayLabel"></span><span class="top-divider"></span><div class="avatar small">{{ current_user[:1]|upper }}</div><div class="top-user"><b>{{ current_user }}</b><small>{{ current_role|title }}</small></div></div></header>
+{% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-wrap">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }} <button onclick="this.parentElement.remove()">×</button></div>{% endfor %}</div>{% endif %}{% endwith %}
+<section class="page-content">{% block content %}{% endblock %}</section>
+<footer class="footer">© 2026 Echelon POS <span>Built for better retail operations <b>✦</b></span></footer></main></div>
+{% else %}{% block auth_content %}{% endblock %}{% endif %}
+<script>const d=document.getElementById('todayLabel');if(d)d.textContent=new Date().toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});</script><script src="{{ url_for('static',filename='app.js') }}"></script>{% block scripts %}{% endblock %}</body></html>
